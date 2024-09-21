@@ -42,52 +42,69 @@ class PartidoCard extends StatelessWidget {
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    width: 60.0,
-                    height: 60.0,
-                    child: Image.network(
-                      partido.logoUrl,
-                      fit: BoxFit.cover,
+                    width: 65.0,
+                    height: 65.0,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Image.network(
+                        partido.logoUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.image_not_supported, size: 40.0);
+                        },
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 16.0),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          partido.nombre,
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          partido.representante,
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            partido.nombre,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4.0),
+                          Text(
+                            partido.representante,
+                            style: const TextStyle(
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   Row(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          IconButton(
-                            icon: const Icon(Icons.arrow_upward),
-                            onPressed: () => FirestoreService.updateVotes(
+                          GestureDetector(
+                            onTap: () => FirestoreService.updateVotes(
                                 partido.id, partido.votos + 1),
+                            child: const Icon(
+                              Icons.arrow_upward,
+                              size: 20.0,
+                            ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.arrow_downward),
-                            onPressed: () {
+                          GestureDetector(
+                            onTap: () {
                               if (partido.votos > 0) {
                                 FirestoreService.updateVotes(
                                     partido.id, partido.votos - 1);
                               }
                             },
+                            child: const Icon(
+                              Icons.arrow_downward,
+                              size: 20.0,
+                            ),
                           ),
                         ],
                       ),
@@ -95,7 +112,9 @@ class PartidoCard extends StatelessWidget {
                       Text(
                         '${partido.votos}',
                         style: const TextStyle(
-                            fontSize: 22, fontWeight: FontWeight.bold),
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
