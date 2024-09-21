@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:votacionesapp/screens/home_screen.dart';
 import 'package:votacionesapp/services/auth_service.dart';
-import 'home_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
