@@ -96,3 +96,4 @@ macos/Flutter/ephemeral/
 # Firebase Emulator files (if you're using Firebase Emulators)
 firebase-debug.log
 .firebaserc
+firebase_options.dart
