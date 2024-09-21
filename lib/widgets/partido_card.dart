@@ -19,7 +19,7 @@ class PartidoCard extends StatelessWidget {
         child: Stack(
           children: [
             Container(
-              height: 100,
+              height: 120,
               decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage('assets/background.jpg'),
@@ -27,62 +27,79 @@ class PartidoCard extends StatelessWidget {
                 ),
               ),
             ),
-
             Container(
-              height: 100,
+              height: 120,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.green.withOpacity(0.5), Colors.transparent],
+                  colors: [Colors.green.withOpacity(0.6), Colors.transparent],
                   begin: Alignment.topLeft,
                   end: Alignment.topRight,
                 ),
               ),
             ),
-            ListTile(
-              leading: SizedBox(
-                width: 50,
-                height: 50,
-                child: Image.network(
-                  partido.logoUrl,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              title: Text(partido.nombre),
-              subtitle: Text(partido.representante),
-              trailing: SizedBox(
-                width: 100,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 60.0,
+                    height: 60.0,
+                    child: Image.network(
+                      partido.logoUrl,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(width: 16.0),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.arrow_upward),
-                          onPressed: () => FirestoreService.updateVotes(
-                              partido.id, partido.votos + 1),
+                        Text(
+                          partido.nombre,
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.arrow_downward),
-                          onPressed: () {
-                            if (partido.votos > 0) {
-                              FirestoreService.updateVotes(
-                                  partido.id, partido.votos - 1);
-                            }
-                          },
+                        Text(
+                          partido.representante,
+                          style: const TextStyle(fontSize: 14),
                         ),
                       ],
                     ),
-                    const SizedBox(width: 10),
-                    Text(
-                      '${partido.votos}',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.arrow_upward),
+                            onPressed: () => FirestoreService.updateVotes(
+                                partido.id, partido.votos + 1),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.arrow_downward),
+                            onPressed: () {
+                              if (partido.votos > 0) {
+                                FirestoreService.updateVotes(
+                                    partido.id, partido.votos - 1);
+                              }
+                            },
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
+                      const SizedBox(width: 8.0),
+                      Text(
+                        '${partido.votos}',
+                        style: const TextStyle(
+                            fontSize: 22, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
