@@ -24,7 +24,6 @@ class HomeScreen extends StatelessWidget {
               print(partido["nombre"]);
               print(partido["representante"]);
               print("---------");
-
               Partido partidoAux = Partido.fromMap(
                   partido.data() as Map<String, dynamic>, partido.id);
 
