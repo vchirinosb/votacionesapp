@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:votacionesapp/screens/home_screen.dart';
-import 'package:votacionesapp/screens/register_screen.dart';
 import 'package:votacionesapp/services/auth_service.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  LoginScreenState createState() => LoginScreenState();
+  RegisterScreenState createState() => RegisterScreenState();
 }
 
-class LoginScreenState extends State<LoginScreen> {
+class RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  bool _isLoading = false;
+  bool _isLoading = false; // Para mostrar un indicador de carga
 
   @override
   void dispose() {
@@ -26,19 +24,15 @@ class LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> _signInWithEmail() async {
+  Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
       try {
-        UserCredential userCredential =
-            await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
+        User? user = await AuthService.registerWithEmailPassword(
+            _emailController.text.trim(), _passwordController.text.trim());
 
-        User? user = userCredential.user;
         if (user != null) {
           await AuthService.createUserInFirestore(user);
           if (mounted) {
@@ -50,7 +44,7 @@ class LoginScreenState extends State<LoginScreen> {
         } else {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Error al iniciar sesión')),
+              const SnackBar(content: Text('Error al registrar el usuario')),
             );
           }
         }
@@ -76,66 +70,10 @@ class LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _signInWithGoogle() async {
-    setState(() {
-      _isLoading = true;
-    });
-    try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser != null) {
-        final GoogleSignInAuthentication googleAuth =
-            await googleUser.authentication;
-        final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
-
-        UserCredential userCredential =
-            await FirebaseAuth.instance.signInWithCredential(credential);
-
-        User? user = userCredential.user;
-        if (user != null) {
-          await AuthService.createUserInFirestore(user);
-          if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
-            );
-          }
-        } else {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text('Error al iniciar sesión con Google')),
-            );
-          }
-        }
-      }
-    } on FirebaseAuthException catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.message}')),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Iniciar Sesión")),
+      appBar: AppBar(title: const Text("Registrar Usuario")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: _isLoading
@@ -176,22 +114,8 @@ class LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(
-                      onPressed: _signInWithEmail,
-                      child: const Text('Iniciar Sesión'),
-                    ),
-                    ElevatedButton(
-                      onPressed: _signInWithGoogle,
-                      child: const Text('Iniciar con Google'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const RegisterScreen()),
-                        );
-                      },
-                      child: const Text('Crear una cuenta'),
+                      onPressed: _register,
+                      child: const Text('Registrar'),
                     ),
                   ],
                 ),

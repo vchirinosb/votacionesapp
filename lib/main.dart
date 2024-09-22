@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:votacionesapp/screens/home_screen.dart';
+import 'package:votacionesapp/screens/login_screen.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -19,8 +19,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Votaciones',
       theme: ThemeData(primarySwatch: Colors.blue),
-      // home: LoginScreen(),
-      home: const HomeScreen(),
+      home: const LoginScreen(),
+      //home: const HomeScreen(),
     );
   }
 }
