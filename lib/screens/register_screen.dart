@@ -15,7 +15,7 @@ class RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  bool _isLoading = false; // Para mostrar un indicador de carga
+  bool _isLoading = false;
 
   @override
   void dispose() {
