@@ -20,10 +20,6 @@ class HomeScreen extends StatelessWidget {
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) {
               DocumentSnapshot partido = snapshot.data!.docs[index];
-              print("---------");
-              print(partido["nombre"]);
-              print(partido["representante"]);
-              print("---------");
               Partido partidoAux = Partido.fromMap(
                   partido.data() as Map<String, dynamic>, partido.id);
 
