@@ -16,7 +16,6 @@ class LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
   bool _isLoading = false;
 
   @override
@@ -37,7 +36,6 @@ class LoginScreenState extends State<LoginScreen> {
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
-
         User? user = userCredential.user;
         if (user != null) {
           await AuthService.createUserInFirestore(user);
@@ -48,24 +46,12 @@ class LoginScreenState extends State<LoginScreen> {
             );
           }
         } else {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Error al iniciar sesión')),
-            );
-          }
+          _showSnackBar('Error al iniciar sesión');
         }
       } on FirebaseAuthException catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: ${e.message}')),
-          );
-        }
+        _showSnackBar('Error: ${e.message}');
       } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: ${e.toString()}')),
-          );
-        }
+        _showSnackBar('Error: ${e.toString()}');
       } finally {
         if (mounted) {
           setState(() {
@@ -103,26 +89,13 @@ class LoginScreenState extends State<LoginScreen> {
             );
           }
         } else {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text('Error al iniciar sesión con Google')),
-            );
-          }
+          _showSnackBar('Error al iniciar sesión con Google');
         }
       }
     } on FirebaseAuthException catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.message}')),
-        );
-      }
+      _showSnackBar('Error: ${e.message}');
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
-      }
+      _showSnackBar('Error: ${e.toString()}');
     } finally {
       if (mounted) {
         setState(() {
@@ -130,6 +103,12 @@ class LoginScreenState extends State<LoginScreen> {
         });
       }
     }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
@@ -140,62 +119,125 @@ class LoginScreenState extends State<LoginScreen> {
         padding: const EdgeInsets.all(16.0),
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
-            : Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(
-                          labelText: 'Correo electrónico'),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Ingrese su correo electrónico';
-                        }
-                        if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value.trim())) {
-                          return 'Ingrese un correo electrónico válido';
-                        }
-                        return null;
-                      },
-                    ),
-                    TextFormField(
-                      controller: _passwordController,
-                      decoration:
-                          const InputDecoration(labelText: 'Contraseña'),
-                      obscureText: true,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Ingrese su contraseña';
-                        }
-                        if (value.trim().length < 6) {
-                          return 'La contraseña debe tener al menos 6 caracteres';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: _signInWithEmail,
-                      child: const Text('Iniciar Sesión'),
-                    ),
-                    ElevatedButton(
-                      onPressed: _signInWithGoogle,
-                      child: const Text('Iniciar con Google'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const RegisterScreen()),
-                        );
-                      },
-                      child: const Text('Crear una cuenta'),
-                    ),
-                  ],
+            : SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildLogo(),
+                      const SizedBox(height: 20),
+                      _buildEmailField(),
+                      const SizedBox(height: 20),
+                      _buildPasswordField(),
+                      const SizedBox(height: 20),
+                      _buildSignInButton(),
+                      const SizedBox(height: 10),
+                      _buildGoogleSignInButton(),
+                      const SizedBox(height: 20),
+                      _buildSignUpOption(),
+                    ],
+                  ),
                 ),
               ),
+      ),
+    );
+  }
+
+  Widget _buildLogo() {
+    return Center(
+      child: Image.asset(
+        'assets/logo.png',
+        height: 100,
+      ),
+    );
+  }
+
+  Widget _buildEmailField() {
+    return TextFormField(
+      controller: _emailController,
+      decoration: InputDecoration(
+        labelText: 'Correo electrónico',
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+        prefixIcon: const Icon(Icons.email),
+      ),
+      keyboardType: TextInputType.emailAddress,
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return 'Ingrese su correo electrónico';
+        }
+        if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value.trim())) {
+          return 'Ingrese un correo electrónico válido';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return TextFormField(
+      controller: _passwordController,
+      decoration: InputDecoration(
+        labelText: 'Contraseña',
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+        prefixIcon: const Icon(Icons.lock),
+      ),
+      obscureText: true,
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return 'Ingrese su contraseña';
+        }
+        if (value.trim().length < 6) {
+          return 'La contraseña debe tener al menos 6 caracteres';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildSignInButton() {
+    return ElevatedButton(
+      onPressed: _signInWithEmail,
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      child: const Text('Iniciar Sesión'),
+    );
+  }
+
+  Widget _buildGoogleSignInButton() {
+    return ElevatedButton.icon(
+      onPressed: _signInWithGoogle,
+      icon: Image.asset(
+        'assets/google_logo.png',
+        height: 24,
+      ),
+      label: const Text('Iniciar con Google'),
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignUpOption() {
+    return TextButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const RegisterScreen()),
+        );
+      },
+      child: const Text(
+        '¿No tienes cuenta? Crear una cuenta',
+        style: TextStyle(color: Colors.blue),
       ),
     );
   }
